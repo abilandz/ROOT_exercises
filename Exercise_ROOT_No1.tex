@@ -1,0 +1,84 @@
+\documentclass[11pt]{article}
+
+\usepackage[lmargin=1.5cm,rmargin=1.5cm,tmargin=2.50cm,bmargin=2.50cm]{geometry}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath,amssymb,url}
+
+\begin{document}
+
+\begin{center}
+\Large{\bf{Functions, histograms and files in ROOT}}\\
+\end{center}
+\begin{center}
+{\small\today}
+\end{center}
+
+\bigskip
+
+\noindent In this first ROOT exercise we cover the following frequently used classes in ROOT:
+%
+\begin{enumerate}
+\item 1-dimensional function (\url{http://root.cern.ch/root/html/TF1.html})
+\item 1-dimensional histogram with floating point precision (\url{http://root.cern.ch/root/html/TH1F.html})
+\item ROOT file (\url{http://root.cern.ch/root/html/TFile.html}) 
+\end{enumerate} 
+In addition, we discuss the difference between the ROOT code execution in interpreted and compiled mode (\url{https://root.cern/manual/interacting_with_shared_libraries/}).
+%
+
+\bigskip\bigskip\bigskip
+
+\noindent Consider the univariate function $f(x)$ defined by the following formula:
+% 
+\begin{equation}
+f(x) = axe^{-bx}\,,
+\label{eq:definition-f}
+\end{equation}
+%
+where $a$ and $b$ are arbitrary constants.
+
+\bigskip
+
+\noindent\textbf{Question 1:} {\it Please implement a piece of the code in a standalone ROOT macro which can be run in interpreted mode (just start with the blank file, its content surround within \{\}, and save it as yourFile.C) which will treat the function $f(x)$ defined in Eq.~(\ref{eq:definition-f}) as a probability density function (p.d.f.) on the interval $0 < x < 1$, where $x$ is variable and ``a'' and ``b'' are parameters (see examples in \url{http://root.cern.ch/root/html/TF1.html})}.
+
+\bigskip
+
+\noindent\textbf{Question 2:} {\it Set parameters ``a'' and ``b'' to be 0.1 and 0.4, respectively, and sample 50000 times variable $x$ from the implemented p.d.f. $f(x)$.}
+
+\bigskip
+
+\noindent\textbf{Question 3:} {\it Define ``histogram for the floats'' (a.k.a. TH1F, see http://root.cern.ch/root/html/TH1F.html) with 1000 bins from 0. to 1., and fill it with the sampled 50000 values of $x$}.
+
+\bigskip
+
+\noindent\textbf{Question 4:} {\it What is the mean value of $x$? (Please search for the relevant member function of TH1F to get such an information in the documentation \url{http://root.cern.ch/root/html/TH1F.html}, i.e. do not calculate the mean value with your own detailed implementation!).}
+
+\bigskip
+
+\noindent\textbf{Question 5:} {\it Rebin the original histogram you have obtained in Q3 to get the new one named ``rebinned'' (or some fancier name you can come up with...) which in the same interval from 0. to 1. has 10 bins, instead of 1000 (again, please check the documentation of TH1F class for the relevant member function in this context)}.
+
+\bigskip
+
+\noindent\textbf{Question 6:} {\it Please define markers of the new rebinned histogram to be red full squares.} 
+
+\bigskip
+
+\noindent\textbf{Question 7:} {\it Add lines in your macro which will make a ROOT file on your computer called ``test.root'' (see \url{http://root.cern.ch/root/html/TFile.html}), and save a histogram named ``rebinned'' obtained in Q5 in that file.}
+
+\bigskip
+
+\noindent\textbf{Question 8:} {\it Can you develop an alternative ROOT macro for all the steps above, which can also be compiled, i.e. executed with:}
+%
+\begin{verbatim}
+root someMacro.C++
+\end{verbatim}
+%
+
+\bigskip
+
+\noindent Please send me the final ROOT file ``test.root'' containing the histogram named ``rebinned'' via email, as well as your two code snippets, the first to be run in interpreted mode and the second in compiled mode, and I will provide the detailed feedback!
+
+\end{document}
+
+
+
