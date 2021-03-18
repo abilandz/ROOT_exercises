@@ -1,0 +1,215 @@
+\documentclass[11pt]{article}
+
+\usepackage[lmargin=1.5cm,rmargin=1.5cm,tmargin=2.50cm,bmargin=2.50cm]{geometry}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath,amssymb,url}
+
+\begin{document}
+
+\begin{center}
+\Large{\bf{Structuring the output of ROOT file and file merging}}\\
+\end{center}
+\begin{center}
+{\small\today}
+\end{center}
+
+\bigskip
+
+\noindent In the fourth ROOT exercise we cover the following frequently used classes:
+%
+\begin{enumerate}
+\item TList (\url{https://root.cern.ch/doc/master/classTList.html})
+\item TDirectoryFile (\url{https://root.cern.ch/doc/v612/classTDirectoryFile.html}) 
+\item TFileMerger (\url{https://root.cern.ch/doc/master/classTFileMerger.html}) 
+\end{enumerate} 
+%
+
+\noindent The main point behind this exercise is to learn about typical structuring of your output ROOT file, which is for instance adopted in ALICE Collaboration. Besides, we also cover the essence of `modus operandi' which is nowadays encountered regularly in high energy physics (e.g. running in distributed mode with 1000+ CPUs over some massive datasets, collecting and merging of all output files, etc.).
+
+Usually, you develop a bunch of classes in C\texttt{++} or ROOT for the data analysis (or analyses tasks, if the official analysis framework of ALICE within AliROOT is used). Each class produces some output (histograms, profiles, etc.), and within each class, you might have different member functions producing separate histograms, profiles, etc. How then you would structure internally all this mess in your final physical ROOT file? This is my suggestion, which is also supported within the ALICE analysis framework:
+%
+\begin{enumerate}
+\item output of each class store in a TDirectoryFile
+\item output of each class' member function store in a dedicated TList
+\end{enumerate}
+
+\noindent Therefore, the content of output ROOT file ideally would have internal structure demonstrated with the following code snippet:
+%
+{\tiny
+\begin{verbatim}
+{
+ // Physical ROOT file:
+ TFile *file = new TFile("test.root","recreate");
+
+ // Output of first class will be saved here:
+ TDirectoryFile *dirFile_1 = new TDirectoryFile("dirFile_1","dirFile_1_title");
+ // Output of first member function in the first class will be saved here:
+ TList *list_11 = new TList();
+ list_11->SetName("list_11_name");
+ // Output of second member function in the first class will be saved here:
+ TList *list_12 = new TList();
+ list_12->SetName("list_12_name");
+ // ...
+
+ // Output of second class will be saved here:
+ TDirectoryFile *dirFile_2 = new TDirectoryFile("dirFile_2","dirFile_2_title");
+ // Output of first member function in the second class will be saved here:
+ TList *list_21 = new TList();
+ list_21->SetName("list_21_name");
+ // ...
+
+ // Some example output objects:
+ TH1D *hist_111 = new TH1D("hist_111","hist_111_title",10,0.,1.);
+ hist_111->SetDirectory(0); // by default, upon creation, each histogram is automatically saved in the currently opened file. You disable that with this line.
+ list_11->Add(hist_111); // add histogram to its TList
+ TH1D *hist_112 = new TH1D("hist_112","hist_112_title",100,0.,100.);
+ hist_112->SetDirectory(0); // by default, upon creation, each histogram is automatically saved in the currently opened file. You disable that with this line.
+ list_11->Add(hist_112); // add histogram to its TList
+ // Finally, add TList to its TDirectoryFile: 
+ dirFile_1->Add(list_11);
+
+ // Some more example output objects:
+ TProfile *pro_211 = new TProfile("pro_211","pro_211_title",10,-5.,5.);
+ pro_211->SetDirectory(0); // by default, upon creation, each profile is automatically saved in the currently opened file. You disable that with this line.
+ list_21->Add(pro_211); // add profile to its TList
+ // Finally, add TList to its TDirectoryFile: 
+ dirFile_2->Add(list_21);
+
+ // Finally, dump each TDirectoryFile in the physical ROOT file:
+ dirFile_1->Write(dirFile_1->GetName(),TObject::kSingleKey);
+ dirFile_2->Write(dirFile_2->GetName(),TObject::kSingleKey);
+
+}
+\end{verbatim}
+}
+%
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 1:} Please execute this code snippet, and with the TBrowser inspect the internal structure of the resulting ROOT file ``test.root''. Study this code snippet, because this is a fairly generic example, and see what you can modify, and what you cannot, without encountering trouble...
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 2:} Start with a blank file and develop a code that will make a histogram with 10 bins and fill it with 10000 points sampled from your favorite function. Take care that histogram is saved in the TList, which is saved in the TDirectoryFile, which is saved in the physical file (as in Q1) above).
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 3:} Make 5 subdirectories, SUBDIR\_0,  SUBDIR\_1, ...,  SUBDIR\_4, copy your code developed in 2) in each subdirectory, and execute. You should get 5 output ROOT files with the same internal structure and the same name in 5 subdirectories. How to prevent sampling in each case to be exactly the same (i.e. you want 5 independent toy Monte Carlo simulations in this example, and not 5 identical copies of the same one)?
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 4:} The Q3 is the simplest example you can think of, but the point I would like to illustrate with it is clear: In reality, you will utilize a huge number of computers to analyze the large LHC datasets, or to run in parallel locally Monte Carlo simulations, and each process will produce the output ROOT file with the same internal structure and the same name, sitting in some subdirectory. Now you want to merge all those low statistics files to get the final, large statistics merged output file, after all jobs have finished. How you would merge output files in Q3 sitting in SUBDIR\_0, SUBDIR\_1, ...,  SUBDIR\_4 into one, large statistics, ROOT file? Please develop that code. Hint: The class TFileMerger might be very helpful...  
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 5:} Validation of merging: Please develop a code snippet which will access the content of let's say first bin of each histogram sitting in the files in SUBDIR\_0,  SUBDIR\_1, ...,  SUBDIR\_4, and sum up these contents programmatically. Is the result the same as the content of the first bin in the merged, large statistics file?
+
+\vspace{0.1044cm}
+
+\noindent Hint: Given your internal file structure, to fetch the pointer to histogram from an external file, you may find the following code snippet useful:
+%
+{\footnotesize
+\begin{verbatim}
+ TFile *outputFile = TFile::Open(<externalPathToYourFile>,"READ");
+ // outputFile->ls(); // prints the name of objects stored in this file
+ TDirectoryFile *directoryFile = dynamic_cast<TDirectoryFile*>(outputFile->Get(<nameOfYourTDirectoryFile>));
+ TList *list = dynamic_cast<TList*>(directoryFile->Get(<nameOfYourList>));
+ TH1D *hist = dynamic_cast<TH1D*>(list->FindObject("<nameOfYourHistograms>"));
+\end{verbatim}}
+
+\noindent Alternatively, in the case the histogram was saved directly into the TFile, you can get its pointer schematically with:
+%
+{\footnotesize
+\begin{verbatim}
+ TFile *outputFile = TFile::Open(<externalPathToYourFile>,"READ");
+ TH1D *hist = dynamic_cast<TH1D*>(outputFile->Get("<nameOfYourHistograms>"));
+\end{verbatim}}
+
+
+\noindent Please send me the code snippets you have developed for the merging in Q4 and for the validation in Q5. 
+
+
+
+
+
+
+
+
+\end{document}
+
+
+\noindent The ROOT Exercise \#3 consists of two parts. After you have accomplished both of them, you will demonstrate that you have acquired enough skills to make the figures of the same quality which appears in the official publications at Large Hadron Collider! 
+
+\vspace{0.44cm}
+
+\noindent \textbf{First part}
+
+\vspace{0.144cm}
+
+\noindent Another frequently encountered case in practice is when somebody sends you the results of his measurements stored in arrays, like for instance me now in the attachment with the file \verb|Example_3.C|, instead in a file with three or more columns. 
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 1:} {\it Please have a look at the attached file for such an example. Add lines in the attached macro which will implement TGraphErrors object which will be automatically initialized with the contents of those arrays (Hint: Now you may prefer another constructor of TGraphErrors, please have a look at the online documentation of that class). I have added some comments, which shall clarify the meaning of each array $\Rightarrow$ this is a very generic example, so please try to memorize it. Please set the following:\\
+%
+\noindent a) Markers of TGraphErrors object to be blue full circles, the color of error lines blue as well;\\
+%
+\noindent b) Title on $y$-axis $v_2$, where 2 is in the subscript. Hint: ROOT recognizes a lot of LaTeX commands. In general, you produce in ROOT some LaTeX symbol if you use `\#' prefix (Example: \verb|\frac{a}{b}| in the ROOT world turns into \verb|#frac{a}{b}|, etc., see further examples in} \url{https://root.cern.ch/root/html/TLatex.html});\\
+%
+\noindent {\it c) Title on $x$-axis to be `centrality';\\
+%
+\noindent d) Please send me the resulting figure in pdf format (Remark: If you didn't bother to introduce separate TCanvas object in your macro, than just use directly a pointer to your TGraphErrors object and call a method \verb|Draw()| by passing `pa' as an arguments, `p' forces drawing of markers, `a' forces drawing of both axes, and save the figure `by clicking')}.
+
+\vspace{0.44cm}
+
+\noindent \textbf{Second part}
+
+\vspace{0.144cm}
+
+\noindent\textbf{Question 1:} {\it Please fetch from the Durham website the data points for Fig. 3 in ALICE publication} \url{http://arxiv.org/pdf/1011.3914v2.pdf}, {\it and reproduce as close as possible this figure in your own plotting macro (i.e. try to resemble the marker styles, colors, axes labels, legend, etc.). Two remarks, though, to make your life simpler:\\
+%
+\noindent a) Forget about STAR measurements in this figure which are indicated with colorful bands and which are there only for comparison sake;\\
+%
+\noindent b) Some of the ALICE measurements are shifted along $x$-axis for visibility sake (literally in order to prevent some markers to overlap, this is a common practice in the field!). In order to achieve this `shifting along $x$-axis', you may find the following function beneficial:
+
+{\small
+\begin{verbatim}
+void ShiftAlongXaxis(TGraphErrors *ge, Double_t shift)
+{
+ // Shift original TGraphErrors along x-axis by amount determined by 'shift'.
+ 
+ if(!ge)
+ {
+  printf("\n WARNING: ge is NULL in ShiftAlongXaxis() !!!! \n\n");
+  return;
+ }
+  
+ Int_t nPoints = ge->GetN();
+ Double_t x = 0.;
+ Double_t y = 0.;
+ for(Int_t p=0;p<nPoints;p++)
+ { 
+  ge->GetPoint(p,x,y);
+  x+=shift;
+  ge->SetPoint(p,x,y);
+ } // end of for(Int_t p=0;p<nPoints;p++)
+
+} // end of void ShiftAlongXaxis(TGraphErrors *ge, Double_t shift)
+\end{verbatim}
+}
+%
+\noindent If you copy and paste the above routine in your plotting macro, you use it as simply as this:
+{\small
+\begin{verbatim}
+ShiftAlongXaxis(pointer-to-TGraphErrors-object,value-of-displacement);
+\end{verbatim}
+}
+}
+
+\noindent Please send me the figure you have obtained via email, as well as code snippets, so I can provide feedback also on your coding!
+
+\end{document}
+
+
+
