@@ -1,0 +1,76 @@
+\documentclass[11pt]{article}
+
+\usepackage[lmargin=1.5cm,rmargin=1.5cm,tmargin=2.50cm,bmargin=2.50cm]{geometry}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath,amssymb,url}
+
+\begin{document}
+
+\begin{center}
+\Large{\bf{Estimating statistical uncertainties with ``hijacked'' bootstrap}}\\
+\end{center}
+\begin{center}
+{\small\today}
+\end{center}
+
+\bigskip\bigskip\bigskip
+
+\noindent The frequently encountered problem, after the experiment is over, is how to report the statistical uncertainty for the measured observables of interest. This is particularly difficult for the compound observables. For instance, if the directly measured observables are $x$ and $y$, but we are interested in the quantity $z\equiv x^2 + e^{-y} + \cos xy$, it is very difficult, if not impossible, to perform the standard error propagation and obtain the statistical uncertainty for $z$, from the statistical uncertainties of $\sigma_x$, $\sigma_y$ and their covariance Cov$(x,y)$, which can be obtained directly. This sort of problem in general can be resolved with the {\it bootstrap} technique.
+
+There is a long story about how to apply the bootstrap technique in the data analysis (see for instance \url{ https://en.wikipedia.org/wiki/Bootstrapping_(statistics)}). To make this long story short, we have simplified procedure and endorsed in ALICE the simplified (``hijacked'') version of this technique. That is the main subject of this exercise. 
+
+The simplified version of bootstrap technique consists of the following steps:
+%
+\begin{enumerate}
+\item You have to divide the initial sample in 10 subsamples, so that each subsample contains about the same statistics;
+%
+\item For each subsample you perform an independent measurement and get for your observable of interest the results $\mu_0$, $\mu_1$, ... , $\mu_9$, respectively;
+%
+\item You then compute an unbiased variance from these 10 subsamples, i.e. 
+%
+\begin{equation}
+\mathrm {Var} = \frac{1}{10-1} \sum_i^{10} (\mu_i-\mu)^2\,, 
+\end{equation}
+%
+where the result for the starting large sample of your observable of interest is denoted by $\mu$ in the above formula.
+%
+\item The final result for your observable of interest and its statistical uncertainty are:
+%
+\begin{equation}
+\mu \pm \sqrt\frac{\rm Var}{10}\,.
+\end{equation}
+%
+\end{enumerate}
+%
+If the statistics permits, one can divide the initial sample in $N > 10$ subsamples, but the final results do not change much (it's easy to implement the above steps for arbitrary $N$, and the procedure makes sense as long as it is possible to ensure that each subsample contains about the same statistics.). On the other hand, for $N<10$ subsamples the bootstrap technique is not stable and is therefore not recommended.
+
+In practice, therefore, the statistical errors are reported in either of the two ways:
+%
+\begin{enumerate}
+\item For simple observables, which can be measured directly, whatever you get from ROOT for its statistical error (e.g. from histogram or profile), is perfectly fine;
+%
+\item For compound observables, the standard error propagation and calculation of covariance matrices are typically not feasible. Instead, use the boostrap technique as described above. Note that here you only need to develop some clever algorithm that will divide your initial dataset in 10 subsets of approx. equal size, but this is typically straightforward. 
+\end{enumerate}
+
+\bigskip
+
+\noindent\textbf{Question 1:} {\it Consider again the Bessel-Gaussian p.d.f., now parameterized as
+%
+\begin{equation}
+f(v)\equiv\frac{v}{b^2}e^{-\frac{v^2+a^2}{2b^2}}I_0(\frac{va}{b^2})\,.
+\label{eq:BesselGaussianPDF}
+\end{equation}
+%
+Use in this exercise that $a^2 + 2b^2 = 0.0025$ and that $a=b/10$ (it can be shown analytically that $\langle v^2\rangle \equiv \mu_{v^2} = a^2 + 2b^2$, so these suggested numbers correspond to the realistic values of elliptic flow in reality, i.e. $v \approx 0.05$). Sample 10M times $v$ from the above distribution, and fill in the histogram (or profile) $v^2$. What is the statistical error of $v^2$ obtained directly from histogram (or profile)? What is the statistical error of $v^2$ obtained from the bootstrap technique using 10 subsamples explained at the beginning? Are the two independently obtained results for statistical error consistent?}
+
+\bigskip
+
+\noindent\textbf{Question 2:} {\it Repeat the bootstrap part of the previous examples for $N = 20$ and $N = 100$ subsamples. Are all 3 results for the statistical error obtained via bootstrap consistent?}
+	
+\bigskip	
+	
+Once validated in a simple Toy Monte Carlo study like this, bootstrap technique can be used readily also for the compound observables, for which the statistical error cannot be obtained directly from the native ROOT classes.
+
+
+\end{document}
