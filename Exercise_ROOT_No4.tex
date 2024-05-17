@@ -25,7 +25,7 @@
 \end{enumerate} 
 %
 
-\noindent The main point behind this exercise is to learn about typical structuring of your output ROOT file, which is for instance adopted in ALICE Collaboration. Besides, we also cover the essence of `modus operandi' which is nowadays encountered regularly in high energy physics (e.g. running in distributed mode with 1000+ CPUs over some massive datasets, collecting and merging of all output files, etc.).
+\noindent The main point behind this exercise is to learn about example structuring of your output ROOT file, which was for instance adopted in ALICE Collaboration. Besides, we also cover the essence of `modus operandi' which is nowadays encountered regularly in high energy physics (e.g. running in distributed mode with 1000+ CPUs over some massive datasets, collecting and merging of all output files, etc.).
 
 Usually, you develop a bunch of classes in C\texttt{++} or ROOT for the data analysis (or analyses tasks, if the official analysis framework of ALICE within AliROOT is used). Each class produces some output (histograms, profiles, etc.), and within each class, you might have different member functions producing separate histograms, profiles, etc. How then you would structure internally all this mess in your final physical ROOT file? This is my suggestion, which is also supported within the ALICE analysis framework:
 %
@@ -99,7 +99,7 @@ Usually, you develop a bunch of classes in C\texttt{++} or ROOT for the data ana
 
 \vspace{0.144cm}
 
-\noindent\textbf{Question 4:} The Q3 is the simplest example you can think of, but the point I would like to illustrate with it is clear: In reality, you will utilize a huge number of computers to analyze the large LHC datasets, or to run in parallel locally Monte Carlo simulations, and each process will produce the output ROOT file with the same internal structure and the same name, sitting in some subdirectory. Now you want to merge all those low statistics files to get the final, large statistics merged output file, after all jobs have finished. How you would merge output files in Q3 sitting in SUBDIR\_0, SUBDIR\_1, ...,  SUBDIR\_4 into one, large statistics, ROOT file? Please develop that code. Hint: The class TFileMerger might be very helpful...  
+\noindent\textbf{Question 4:} The Q3 is the simplest example you can think of, but the point I would like to illustrate with it is clear: In reality, you will utilize a huge number of computers to analyze the large LHC datasets, or to run in parallel locally Monte Carlo simulations, and each process will produce the output ROOT file with the same internal structure and the same name, sitting in some subdirectory. Now you want to merge all those low statistics files to get the final, large statistics merged output file, after all jobs have finished. How you would merge output files in Q3 sitting in SUBDIR\_0, SUBDIR\_1, ...,  SUBDIR\_4 into one, large statistics, ROOT file? Hint: Either you can use the class TFileMerger and develop your own code for merging, or better, you can use executable {\bf hadd} which comes with ROOT, and which is developed for merging by experts (if you have ROOT environment initialized, just execute in he terminal {\bf hadd \--\--help} to learn how to use it).    
 
 \vspace{0.144cm}
 
