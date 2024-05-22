@@ -82,7 +82,7 @@ In the above equation, $I_0$ is a modified Bessel function of the first kind, an
 
 \bigskip
 	 
-\noindent {\bf Hint:} Implement Bessel-Gaussian p.d.f. as TF1 and then inspect how the member function Fit(...) of histogram class works.
+\noindent {\bf Hint:} Implement Bessel-Gaussian p.d.f. as TF1 object and then inspect how the member function Fit(...) of histogram class works. For the support of special functions in ROOT, please consult the class TMath. For instance, as a part of TF1 formula, you can use \verb|TMath::BesselI0(x)| for the modified Bessel function of the first kind $I_{0}(x)$, etc. 
 
 \bigskip
 		
