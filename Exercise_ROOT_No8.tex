@@ -8,7 +8,7 @@
 \begin{document}
 
 \begin{center}
-\Large{\bf{Making a look-up table in ROOT}}\\
+\Large{\bf{Systematical errors and Barlow test}}\\
 \end{center}
 \begin{center}
 {\small\today}
@@ -16,161 +16,100 @@
 
 \bigskip
 
-\noindent In this ROOT exercise we cover the following classes:
-%
-\begin{enumerate}
-	\item TExMap (\url{http://root.cern.ch/root/html/TExMap.html})
-\end{enumerate} 
-%
+In one of the previous exercises it was discussed how to determine statistical error of the measurement, e.g. by using the subsampling technique. Statistical errors are unavoidable and typically result from the finite amount of data available for the analysis. However, there are other types of errors which can occur during the measurement, which can originate from the malfunctioning of the detector, corrupted data, etc. These errors are called systematical errors, and, unlike statistical errors, they cannot be suppressed by increasing the size of dataset. Since statistical and systematical errors are fundamentally different, they are reported separately in an experiment.
 
-\bigskip\bigskip
+However, in practice it's not always easy to disentangle statistical and systematical errors. Especially in small datasets, large statistical variations can be wrongly to a certain degree attributed to systematical errors. This problem is resolved with the so-called {\it Barlow test}, which is the subject of this exercise. The text in this exercise is reproduced and adapted with permission, from M. Sc. thesis of Marcel Lesch in Ref.~\cite{Lesch:2021}, while a more detailed exposure can be found in Refs.~\cite{Barlow:2002yb,Barlow:1}. 
 
-\end{document}
-
-\noindent The frequently encountered problem, after the experiment is over, is how to report the statistical uncertainty for the measured observables of interest. This is particularly difficult for the compound observables. For instance, if the directly measured observables are $x$ and $y$, but we are interested in the quantity $z\equiv x^2 + e^{-y} + \cos xy$, it is very difficult, if not impossible, to perform the standard error propagation and obtain the statistical uncertainty for $z$, from the statistical uncertainties of $\sigma_x$, $\sigma_y$ and their covariance Cov$(x,y)$, which can be obtained directly. This sort of problem in general can be resolved with the {\it bootstrap} technique.
-
-There is a long story about how to apply the bootstrap technique in the data analysis (see for instance \url{ https://en.wikipedia.org/wiki/Bootstrapping_(statistics)}). To make this long story short, we have simplified procedure and endorsed in ALICE the simplified (``hijacked'') version of this technique. That is the main subject of this exercise. 
-
-The simplified version of bootstrap technique consists of the following steps:
-%
-\begin{enumerate}
-\item You have to divide the initial sample in 10 subsamples, so that each subsample has about the same statistics;
-%
-\item For each subsample you perform an independent measurement and get for your observable of interest the results $\mu_0$, $\mu_1$, ... , $\mu_9$, respectively;
-%
-\item You then compute an unbiased variance from these 10 subsamples, i.e. 
+The typical analysis in high-energy physics commences with the definition of default event and track selection criteria, which leads to the measurement and statistical uncertainty, $y \pm \sigma$, of some observable of interest. To estimate systematical error, one of the default values in the event or track selection is changed and the analysis is redone with this variation. As such, the results related to this single change of a parameter are referred to as the \textit{trial} (denoted by $y_{\rm trial}$). To study whether the divergence between the trial and the initial default results $y_{\rm default}$ is of significance, their difference is calculated as a first step. It is defined as 
 %
 \begin{equation}
-\mathrm {Var} = \frac{1}{10-1} \sum_i^{10} (\mu_i-\mu)^2\,, 
-\end{equation}
+	\mathit{Diff} = y_{\rm trial} - y_{\rm default} \,.
+\end{equation} 
 %
-where the result for the starting large sample of your observable of interest is denoted by $\mu$ in the above formula.
-%
-\item The final result for your observable of interest and its statistical uncertainty are:
+To determine its statistical significance, the error of the trial $\sigma_{\rm trial}$ in comparison to the one of the default analysis $\sigma_{\rm default}$ has to be accounted for. The importance of this lies in the statistical influence of the used trials. In general, when a selection cut is tightened, less data is used for the analysis leading to an increased statistical error for the trial, while a looser cut leads to the opposite effect in general. To account for this, the so-called \textit{error on the difference} is used:
 %
 \begin{equation}
-\mu \pm \sqrt\frac{\rm Var}{10}\,.
+	\mathit{Err} = \sqrt{\left| \sigma_{\rm trial}^2 - \sigma_{\rm default}^2\right|} \,.\label{Eq. Error in Difference}
 \end{equation}
 %
-\end{enumerate}
-%
-If the statistics permits, one can divide the initial sample in $N > 10$ subsamples, but the results do not change much (it's easy to implement the above steps for arbitrary steps). On the other hand, for $N<10$ subsamples the bootstrap technique is not stable and therefore cannot be used.
-
-In practice:
-1/ For simple fundamental observable, whatever you get from ROOT for the statistical error (i.e. from histogram or profile), is perfectly fine;
-2/ For compound observable, please do not bother with the error propagation and covariance matrrices, simply use boostrap. Here, in addition, you only need to develop some clever algorithm that will divide your total dataset in 10 subsets of approx. equal size, but this is typically straightforward. 
-
-In general, two random observables $x$ and $y$, with sample spaces $X$ and $Y$, are said to be statistically independent if their joint 2-variate p.d.f. $f_{xy}(x,y)$ fully factorizes into the product of two marginal p.d.f.'s $f_{x}(x)$ and $f_{y}(y)$:  
+In the last equation, the minus sign has to be used because the datasets used for the trial and default are correlated to each other as they only differ in one selection criterion while being part of the larger, default dataset. Would the two datasets be uncorrelated to each other, a plus sign would have to be used in Eq.~\eqref{Eq. Error in Difference}.
+Given the difference and the error in difference, the so-called $\sigma_{\rm Barlow}$ can be computed as 
 %
 \begin{equation}
-f_{xy}(x,y) = f_{x}(x)f_{y}(y)\,.
+	\sigma_{\rm Barlow} = \frac{\mathit{Diff}}{\mathit{Err}} \,.
+	\label{eq:barlow}
 \end{equation}
 %
-In the above equation, $f_{x}(x)$ and $f_{y}(y)$ are two marginal distributions defined as:
+The $\sigma_{\rm Barlow}$ quantifies the statistical significance of the performed trial. If it is found to be greater than a certain value, the trial is classified as a statistically relevant deviation. In this exercise, a critical value of $\sigma_{\rm Barlow} = 2$ is used i.e. every trial with $\sigma_{\rm Barlow} > 2$ is counted as statistically important. 
+
+As a last step, the systematical error has to be computed. For this, the so-called \textit{relative variation} is used and systematical error is computed as 
+%
+\begin{equation} 
+	\sigma_{\rm sys} = \frac{\mathit{Diff}}{y_{\rm default}}\,.
+\end{equation}
+%
+In case more independent trials have been performed, the final systematical error of all trials is then obtained as the square root of all the individual statistical errors added in quadrature. 
+
+\bigskip
+
+
+\noindent Consider the univariate function $f(x)$ defined by the following formula:
 % 
-\begin{eqnarray}
-f_x(x) &=& \int_Y f_{xy}(x,y)\,dy\,,\nonumber\\
-f_y(y) &=& \int_X f_{xy}(x,y)\,dx\,.
-\label{eq:marginalizedPDFs}
-\end{eqnarray}
+\begin{equation}
+	f(x) = Nxe^{-x}\,\quad x\in [0,1),
+	\label{eq:definition-f}
+\end{equation}
 %
-In general, $f_{x}(x)$ and $f_{y}(y)$ can have completely different functional forms. 
+where $N$ is normalization constant.
 
-\bigskip\bigskip\bigskip
+\bigskip
 
-\noindent\textbf{Question 1:} {\it Consider the following 2-variate p.d.f.'s: a) $f_{xy}(x,y) = e^{-(x-4)^2}\log y$, and b) $f_{xy}(x,y) = e^{-(x-4)^2}+\log y$. Demonstrate that in the first case observables $x$ and $y$ are statistically independent, and that in the second case they are not statistically independent.}
+\noindent\textbf{Question 1:} {\it Determine analytically $N$ from the normalization condition $\int_0^1 f(x)dx = 1$. After that, calculate analytically the true mean value $\mu_x$ (or expectation value $E[x]$ or $\left<x\right>$) from formula $\mu_x \equiv \int_0^1 x f(x) dx$.}
+
+\bigskip
+
+\noindent\textbf{Question 2:} {\it Implement a piece of the code in ROOT which will treat the function $f(x)$ defined in Eq.~(\ref{eq:definition-f}) as a probability density function (p.d.f.) on the interval $0 < x < 1$, where $x$ is variable (see examples in \url{http://root.cern.ch/root/html/TF1.html}). It's perfectly fine if you re-use and adapt here some code from one of previous exercises.} 
+
+\bigskip
+
+\noindent\textbf{Question 3:} {\it Sample $x$ from $f(x)$ and inject randomly among sampled values the ``outliers", i.e. take randomly values for $x$ also from interval $[1,2)$ which is outside of the initial phase space of $x$ defined in Eq.~(\ref{eq:definition-f}). Simulate outliers with some suitable frequency, e.g. after 10 healthy events, inject in the dataset one outlier event, or something similar. In this context these ``outliers'' are nonphysical events, and they have to be removed from the results either by introducing special cuts, or if that is not feasible, they have to be assigned to systematical error.}
+
+\bigskip
+
+\noindent\textbf{Question 4:} {\it From the sampled values of $x$, calculate $\left<x\right>$ and its statistical uncertainty $\sigma$, taking into account all values of $x$ (also the outliers). This is the default measurement $\left<x\right>_{\rm default}$. Then, repeat the procedure, but take into the average $\left<x\right>$ only those values of $x$ which satisfy the condition $0 \leq x < 1$ (in this context, this is your ``cut''). This is the trial measurement $\left<x\right>_{\rm trial}$.
 	
 \bigskip
 
-\noindent\textbf{Hint \#1}: Implement in ROOT 2-variate p.d.f. as TF2 object, and sample observables $x$ and $y$ simultaneously from it. With all sampled pairs fill some 2D histogram (see e.g. the class TH2F). Normalize that 2D histogram, and then obtain two marginal histograms by making projections along $x$ and $y$ axis, i.e. schematically: 
-{\small
-%
-\begin{verbatim}
-TH1F *marginalX = (TH1F*)f2DhistNormalized->ProjectionX();
-TH1F *marginalY = (TH1F*)f2DhistNormalized->ProjectionY();
-\end{verbatim}
-%
-}
-\noindent Note that if the starting 2D histogram is normalized, the two 1D marginal histograms obtained from it are automatically normalized. Finally, inspect a 2D ratio (e.g. introduce the new TH2F object for the ratio), between the starting 2D histogram, and the product of the two 1D marginal histograms. If this ratio is 1 everywhere, $x$ and $y$ are statistically independent.
+\noindent\textbf{Question 5:} {\it Repeat Step 4 for several choices of total number of samplings $N_{\rm events}$. For each value of $N_{\rm events}$, calculate $\sigma_{\rm Barlow}$ from Eq.~(\ref{eq:barlow}), and make a plot $\sigma_{\rm Barlow} (N_{\rm events})$. How many events you have to simulate (or here, how many times you have to sample $x$), to reach the condition $\sigma_{\rm Barlow} > 2$? After you reached that condition, how you report your final result? Hint: Use the format $\left<x\right> \pm \sigma_{\rm stat} \pm \sigma_{\rm sys}$.
 
-\bigskip
 
-\noindent\textbf{Hint \#2}: In order to sample 2 observables from 2-variate p.d.f. simultaneously, the following code snippet might be helpful:
-{\small
-% 
-\begin{verbatim}
-Double_t x = 0., y = 0.;
-for(Int_t n = 0; n < nSamplings; n++)
-{
- f2D->GetRandom2(x,y); // f2D was declared as TF2 object
- f2Dhist->Fill(x,y); // f2Dhist was declared as TH2F object
-}
-\end{verbatim}
-%
-} % small 
-\noindent This procedure can be straightforwardly generalized for the 3D case (see the classes TF3 and TH3F). On the other hand, going to 4D or even higher dimensions is not that straightforward in ROOT. While the general $n$-dimensional histogram can be found in the class THnSparse (see \url{https://root.cern.ch/doc/master/classTHnSparse.html}), the new implementation of multidimensional sampling which would correspond to the general TFN object requires some (non-trivial) work.
+\begin{thebibliography}{1000}
+	
+	%\cite{Lesch:2021}
+	\bibitem{Lesch:2021}
+	M.~Lesch, 
+	``Analyses of Symmetry Plane Correlations in Pb--Pb Collisions at 2.76 TeV with ALICE at the LHC,''
+	M. Sc. thesis (2021), Technical University of Munich.
+	%0 citations counted in INSPIRE as of 26 Jun 2023
+	
+	%\cite{Barlow:2002yb}
+    \bibitem{Barlow:2002yb}
+    R.~Barlow,
+    ``Systematic errors: Facts and fictions,''
+    [arXiv:hep-ex/0207026 [hep-ex]].
+    %156 citations counted in INSPIRE as of 28 Jul 2023
+ 	
+	%\cite{Barlow:1}
+	\bibitem{Barlow:1}
+	R.~Barlow,
+	``Statistics: A Guide to the Use of Statistical Methods in the Physical Sciences,''
+	Manchester Physics Series, (1989), WileyBlackwell.
+		
+\end{thebibliography}
 
-\newpage
-
-\noindent \textbf{{Hint \#3}}: In order to check whether a histogram is normalized or not, check out the value of:
-{\small
-% 
-\begin{verbatim}
-hist->Integral();
-\end{verbatim}
-%
-} % small
-\noindent This member function is the same also for 2D and 3D case.
- % \it
-
-\bigskip
-
-\noindent By building up on top of this example, in real life for any 2D histogram obtained in an experiment we can deduce straightforwardly whether it was filled with two statistically independent or two correlated observables. 
-
-\bigskip
-
-\begin{center}
-\Large{\bf{Cumulants from hell}}\\
-\end{center}
-
-If two random observables are not statistically independent (i.e. if they are correlated), without loss of generality we can always write:
-%
-\begin{equation}
-f_{xy}(x,y) = f_{x}(x)f_{y}(y) + c_{xy}(x,y)\,.
-\end{equation}
-%
-Therefore, by construction any direct correlation between observables $x$ and $y$ is encoded solely in $c_{xy}(x,y)$, which is by definition the 2-particle cumulant, or the genuine 2-particle correlation. Cumulants cannot be measured directly, but from the above expressions we obtain trivially:
-%
-\begin{equation}
-c_{xy}(x,y) = f_{xy}(x,y) - f_{x}(x)f_{y}(y)\,.
-\label{eq:cumulant}
-\end{equation}
-%
-In terms of expectation values (averages), Eq.~(\ref{eq:cumulant}) reads:
-%
-\begin{equation}
-\left<xy\right>_c = \left<xy\right> - \left<x\right>\left<y\right>\,.
-\label{eq:cumulant:averages}
-\end{equation}
-%
-This reasoning can be straightforwardly generalized for multivariate case. Without going into the derivation/details now, the final results for the relevant 2D and 3D cumulants, for a system consisting of 3 random observables $x$, $y$ and $z$, are given by the following formulas:
-%
-\begin{eqnarray}
-\left<xy\right>_c&=&\left<xy\right> - \left<x\right>\left<y\right>\nonumber\\
-\left<xz\right>_c&=&\left<xz\right> - \left<x\right>\left<z\right>\nonumber\\
-\left<yz\right>_c&=&\left<yz\right> - \left<y\right>\left<z\right>\nonumber\\
-\left<xyz\right>_c&=&\left<xyz\right>\nonumber\\
-&-&\left<xy\right>\left<z\right>-\left<xz\right>\left<y\right>-\left<yz\right>\left<x\right>\nonumber\\
-&+& 2\left<x\right>\left<y\right>\left<z\right>\nonumber
-\end{eqnarray}
-%
-
-\bigskip
-
-\noindent\textbf{Question 2:} {\it Please implement in ROOT the 3-variate p.d.f. $f_{xyz}(x,y,z) \equiv e^{xy+xz+yz} =  e^{xy}e^{xz}e^{yz}$ by using the class TF3. Since this p.d.f. partially factorizes, it is clear that by design it describes only the genuine 2-particle correlations among $x$ and $y$, $x$ and $z$, and $y$ and $z$, respectively. Demonstrate by developing the code in ROOT that all 2D cumulants in this example are not zero, while the 3D cumulant is zero.} 
-
-\bigskip
-
-\noindent By building up on top of this example, in an experiment we can deduce whether there exists a genuine 3-body interaction in the system, which cannot be expressed as a superposition of lower two- and single-particle terms. Non-vanishing 3-particle cumulant undoubtedly points to the existence of genuine 3-body interaction.  
 
 \end{document}
+
+
+
+
