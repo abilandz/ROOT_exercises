@@ -18,9 +18,9 @@
 
 In one of the previous exercises it was discussed how to determine statistical error of the measurement, e.g. by using the subsampling technique. Statistical errors are unavoidable and typically result from the finite amount of data available for the analysis. However, there are other types of errors which can occur during the measurement, which can originate from the malfunctioning of the detector, corrupted data, etc. These errors are called systematical errors, and, unlike statistical errors, they cannot be suppressed by increasing the size of dataset. Since statistical and systematical errors are fundamentally different, they are reported separately in an experiment.
 
-However, in practice it's not always easy to disentangle statistical and systematical errors. Especially in small datasets, large statistical variations can be wrongly to a certain degree attributed to systematical errors. This problem is resolved with the so-called {\it Barlow test}, which is the subject of this exercise. The text in this exercise is reproduced and adapted with permission, from M. Sc. thesis of Marcel Lesch in Ref.~\cite{Lesch:2021}, while a more detailed exposure can be found in Refs.~\cite{Barlow:2002yb,Barlow:1}. 
+However, in practice it's not always easy to disentangle statistical and systematical errors. Especially in small datasets, large statistical variations can be wrongly to a certain degree attributed to systematical errors. This problem is resolved with the so-called {\it Barlow test}, which is the subject of this exercise. The text in this exercise is reproduced and adapted with permission from M. Sc. thesis of Marcel Lesch in Ref.~\cite{Lesch:2021}, while a more detailed exposure can be found in Refs.~\cite{Barlow:2002yb,Barlow:1}. 
 
-The typical analysis in high-energy physics commences with the definition of default event and track selection criteria, which leads to the measurement and statistical uncertainty, $y \pm \sigma$, of some observable of interest. To estimate systematical error, one of the default values in the event or track selection is changed and the analysis is redone with this variation. As such, the results related to this single change of a parameter are referred to as the \textit{trial} (denoted by $y_{\rm trial}$). To study whether the divergence between the trial and the initial default results $y_{\rm default}$ is of significance, their difference is calculated as a first step. It is defined as 
+The typical analysis in high-energy physics commences with the definition of default event and track selection criteria, which leads to the default measurement and its statistical uncertainty, $y_{\rm default} \pm \sigma_{\rm default}$, of some observable of interest. To estimate systematical error, one of the default values in the event or track selection criteria is changed and the analysis is redone with this variation. As such, the results related to this single change of a parameter are referred to as the \textit{trial} (denoted by $y_{\rm trial}$). To study whether the divergence between the trial and the initial default results $y_{\rm default}$ is of significance, their difference is calculated as a first step. It is defined as 
 %
 \begin{equation}
 	\mathit{Diff} = y_{\rm trial} - y_{\rm default} \,.
@@ -48,7 +48,12 @@ As a last step, the systematical error has to be computed. For this, the so-call
 	\sigma_{\rm sys} = \frac{\mathit{Diff}}{y_{\rm default}}\,.
 \end{equation}
 %
-In case more independent trials have been performed, the final systematical error of all trials is then obtained as the square root of all the individual statistical errors added in quadrature. 
+In case more independent trials have been performed, the final systematical error of all trials is then obtained as the square root of all the individual systematical errors added in quadrature, e.g. for $n$ trials:
+%
+\begin{equation}
+	\sigma_{\rm sys, final} = \sqrt{ \sigma_{\rm sys, 1}^2 + \sigma_{\rm sys, 2}^2 + \ldots + \sigma_{{\rm sys,} n}^2}\,.
+\end{equation}
+% 
 
 \bigskip
 
@@ -72,7 +77,7 @@ where $N$ is normalization constant.
 
 \bigskip
 
-\noindent\textbf{Question 3:} {\it Sample $x$ from $f(x)$ and inject randomly among sampled values the ``outliers", i.e. take randomly values for $x$ also from interval $[1,2)$ which is outside of the initial phase space of $x$ defined in Eq.~(\ref{eq:definition-f}). Simulate outliers with some suitable frequency, e.g. after 10 healthy events, inject in the dataset one outlier event, or something similar. In this context these ``outliers'' are nonphysical events, and they have to be removed from the results either by introducing special cuts, or if that is not feasible, they have to be assigned to systematical error.}
+\noindent\textbf{Question 3:} {\it Sample $x$ from $f(x)$ and inject randomly among sampled values the ``outliers", i.e. take randomly values for $x$ also from interval $[1,2)$ which is outside of the initial phase space of $x$ defined in Eq.~(\ref{eq:definition-f}). Simulate outliers with some suitable frequency, e.g. after 10 healthy events, inject in the dataset one outlier event, or something similar. In this context these ``outliers'' are nonphysical events, and they have to be removed from the results either by introducing special selection criteria, i.e. ``cuts", or if that is not feasible, they have to be assigned to systematical error.}
 
 \bigskip
 
