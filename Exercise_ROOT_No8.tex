@@ -16,11 +16,11 @@
 
 \bigskip
 
-In one of the previous exercises it was discussed how to determine statistical error of the measurement, e.g. by using the subsampling technique. Statistical errors are unavoidable and typically result from the finite amount of data available for the analysis. However, there are other types of errors which can occur during the measurement, which can originate from the malfunctioning of the detector, corrupted data, etc. These errors are called systematical errors, and, unlike statistical errors, they cannot be suppressed by increasing the size of dataset. Since statistical and systematical errors are fundamentally different, they are reported separately in an experiment.
+In one of the previous exercises, it was discussed how to determine the statistical error of the measurement, e.g. by using the subsampling technique. Statistical errors are unavoidable and typically result from the finite amount of data available for the analysis. However, other types of errors can occur during the measurement, which can originate from the malfunctioning of the detector, corrupted data, etc. These errors are called systematical errors, and, unlike statistical errors, they cannot be suppressed by increasing the dataset size. Since statistical and systematical errors are fundamentally different, they are reported separately in an experiment.
 
-However, in practice it's not always easy to disentangle statistical and systematical errors. Especially in small datasets, large statistical variations can be wrongly to a certain degree attributed to systematical errors. This problem is resolved with the so-called {\it Barlow test}, which is the subject of this exercise. The text in this exercise is reproduced and adapted with permission from M. Sc. thesis of Marcel Lesch in Ref.~\cite{Lesch:2021}, while a more detailed exposure can be found in Refs.~\cite{Barlow:2002yb,Barlow:1}. 
+In an actual experiment, it's not always easy to disentangle statistical and systematical errors. Especially in small datasets, variations due to large statistical fluctuations can be wrongly attributed to a certain degree to systematical errors. This problem is resolved with the so-called {\it Barlow test}, which is the subject of this exercise. The text in this exercise is reproduced and adapted with permission from M. Sc. thesis of Marcel Lesch in Ref.~\cite{Lesch:2021}, while a more detailed exposure can be found in Refs.~\cite{Barlow:2002yb,Barlow:1}. 
 
-The typical analysis in high-energy physics commences with the definition of default event and track selection criteria, which leads to the default measurement and its statistical uncertainty, $y_{\rm default} \pm \sigma_{\rm default}$, of some observable of interest. To estimate systematical error, one of the default values in the event or track selection criteria is changed and the analysis is redone with this variation. As such, the results related to this single change of a parameter are referred to as the \textit{trial} (denoted by $y_{\rm trial}$). To study whether the divergence between the trial and the initial default results $y_{\rm default}$ is of significance, their difference is calculated as a first step. It is defined as 
+The typical analysis in high-energy physics commences with the definition of default event and track selection criteria (i.e. default \textit{cuts} for short), which leads to the default measurement and its statistical uncertainty, $y_{\rm default} \pm \sigma_{\rm default}$, of some observable of interest. To estimate systematical error, one of the default values in the event or track selection criteria is changed and the analysis is redone with this variation. As such, the results related to this single change of a parameter are referred to as the \textit{trial} (denoted by $y_{\rm trial}$). To study whether the divergence between the trial and the initial default results $y_{\rm default}$ is of significance, their difference is calculated as a first step. It is defined as 
 %
 \begin{equation}
 	\mathit{Diff} = y_{\rm trial} - y_{\rm default} \,.
@@ -58,10 +58,10 @@ In case more independent trials have been performed, the final systematical erro
 \bigskip
 
 
-\noindent Consider the univariate function $f(x)$ defined by the following formula:
+\noindent This general formalism is now applied for concrete example in this exercise. Consider the univariate function $f(x)$ defined by the following formula:
 % 
 \begin{equation}
-	f(x) = Nxe^{-x}\,\quad x\in [0,1),
+	f(x) = Nxe^{-x}\,,\quad x\in [0,1),
 	\label{eq:definition-f}
 \end{equation}
 %
@@ -69,23 +69,23 @@ where $N$ is normalization constant.
 
 \bigskip
 
-\noindent\textbf{Question 1:} {\it Determine analytically $N$ from the normalization condition $\int_0^1 f(x)dx = 1$. After that, calculate analytically the true mean value $\mu_x$ (or expectation value $E[x]$ or $\left<x\right>$) from formula $\mu_x \equiv \int_0^1 x f(x) dx$.}
+\noindent\textbf{Question 1:} {\it Determine analytically $N$ from the normalization $\int_0^1 f(x)dx = 1$. After that, calculate analytically the true mean value $\mu_x$ (also denoted as expectation value $E[x]$ or $\left<x\right>$) from the formula $\mu_x \equiv \int_0^1 x f(x) dx$.}
 
 \bigskip
 
-\noindent\textbf{Question 2:} {\it Implement a piece of the code in ROOT which will treat the function $f(x)$ defined in Eq.~(\ref{eq:definition-f}) as a probability density function (p.d.f.) on the interval $0 < x < 1$, where $x$ is variable (see examples in \url{http://root.cern.ch/root/html/TF1.html}). It's perfectly fine if you re-use and adapt here some code from one of previous exercises.} 
+\noindent\textbf{Question 2:} {\it Implement the code in ROOT which will treat the function $f(x)$ defined in Eq.~(\ref{eq:definition-f}) as a probability density function (p.d.f.) on the interval $0 < x < 1$, where $x$ is variable (see examples in \url{http://root.cern.ch/root/html/TF1.html}). It's perfectly fine if you re-use and adapt in this part some code developed for previous exercises.} 
 
 \bigskip
 
-\noindent\textbf{Question 3:} {\it Sample $x$ from $f(x)$ and inject randomly among sampled values the ``outliers", i.e. take randomly values for $x$ also from interval $[1,2)$ which is outside of the initial phase space of $x$ defined in Eq.~(\ref{eq:definition-f}). Simulate outliers with some suitable frequency, e.g. after 10 healthy events, inject in the dataset one outlier event, or something similar. In this context these ``outliers'' are nonphysical events, and they have to be removed from the results either by introducing special selection criteria, i.e. ``cuts", or if that is not feasible, they have to be assigned to systematical error.}
+\noindent\textbf{Question 3:} {\it Sample $x$ from the p.d.f. $f(x)$ and inject randomly among sampled values the ``outliers", i.e. take randomly values for $x$ also from interval $[1,2)$ which is outside of the initial phase space of $x$ defined in Eq.~(\ref{eq:definition-f}). Simulate outliers with some suitable frequency, e.g. after 10 healthy events, inject in the dataset one outlier event, or something similar. In this context, these ``outliers'' are nonphysical events, and they have to be removed from the results either by introducing special selection criteria, i.e. special cuts, or if that is not feasible, they have to be assigned to systematical error.}
 
 \bigskip
 
-\noindent\textbf{Question 4:} {\it From the sampled values of $x$, calculate $\left<x\right>$ and its statistical uncertainty $\sigma$, taking into account all values of $x$ (also the outliers). This is the default measurement $\left<x\right>_{\rm default}$. Then, repeat the procedure, but take into the average $\left<x\right>$ only those values of $x$ which satisfy the condition $0 \leq x < 1$ (in this context, this is your ``cut''). This is the trial measurement $\left<x\right>_{\rm trial}$.
+\noindent\textbf{Question 4:} {\it From the sampled values of $x$, calculate $\left<x\right>$ and its statistical uncertainty $\sigma$, taking into account all values of $x$ (including the outliers). This is the default measurement $\left<x\right>_{\rm default}$. Then, repeat the procedure, but take into the average $\left<x\right>$ only those values of $x$ which satisfy the condition $0 \leq x < 1$ (in this context, this is your analysis ``cut''). This is the trial measurement $\left<x\right>_{\rm trial}$.
 	
 \bigskip
 
-\noindent\textbf{Question 5:} {\it Repeat Step 4 for several choices of total number of samplings $N_{\rm events}$. For each value of $N_{\rm events}$, calculate $\sigma_{\rm Barlow}$ from Eq.~(\ref{eq:barlow}), and make a plot $\sigma_{\rm Barlow} (N_{\rm events})$. How many events you have to simulate (or here, how many times you have to sample $x$), to reach the condition $\sigma_{\rm Barlow} > 2$? After you reached that condition, how you report your final result? Hint: Use the format $\left<x\right> \pm \sigma_{\rm stat} \pm \sigma_{\rm sys}$.
+\noindent\textbf{Question 5:} {\it Repeat Step 4 for several choices of total number of samplings $N_{\rm events}$. For each value of $N_{\rm events}$, calculate $\sigma_{\rm Barlow}$ from Eq.~(\ref{eq:barlow}), and make a plot $\sigma_{\rm Barlow} (N_{\rm events})$. How many events you have to simulate (or in this exercise, how many times you have to sample $x$), to reach the condition $\sigma_{\rm Barlow} > 2$? After you reached that condition, how you report your final result? Hint: Use the format $\left<x\right> \pm \sigma_{\rm stat} \pm \sigma_{\rm sys}$.
 
 
 \begin{thebibliography}{1000}
