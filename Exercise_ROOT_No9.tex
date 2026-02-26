@@ -25,13 +25,13 @@
 
 \bigskip
 
-\noindent Regular histogram classes in ROOT, namely TH1, TH2, TH3, can be readily used for 1-dimensional, 2-dimensional, and 3-dimensional problems, respectively. However, already for 3-dimensional case the memory consumption becomes a serious concern. For instance, if one wants to book 3-dimensional histogram with double precision (8 bytes), using 10000 bins in each dimension, that might blow up all available memory on a computer, because $(10^5)^3 \times 8\ {\rm B} = 8 \times 10^{15}\ {\rm B} = 8\ {\rm PB}$ is a huge number. It is therefore essential to come up with another histogramming technology, which will allocate memory for bins only for those bins which are needed and filled. On the other hand, for empty bins memory shall not be allocated at all.
+\noindent Regular histogram classes in ROOT, namely TH1, TH2, and TH3, can be readily used for 1-, 2-, and 3-dimensional problems, respectively. However, already for 3-dimensional case the memory consumption becomes a serious concern. For instance, if one wants to book 3-dimensional histogram with double precision (8 bytes), using 10000 bins in each dimension, that might blow up all available memory on a computer, because $(10^5)^3 \times 8\ {\rm B} = 8 \times 10^{15}\ {\rm B} = 8\ {\rm PB}$ is a huge number. It is therefore essential to use another histogramming technique, that will allocate memory only for those bins which are needed and filled. On the other hand, for empty bins memory shall not be allocated at all.
 
-This can be achieved in ROOT with the class {\verb |THnSparse|}. In this exercise, we demonstrate how to use these histograms in practice.
+This can be achieved in ROOT with the class {\verb |THnSparse|}. In this exercise, we demonstrate how to use these multi-dimensional histograms in practice.
 
 \bigskip
 
-\noindent\textbf{Declaration, filling and retrieving the content:} {\it Use this code snippet and save it in the file named {\it sparse.C} --- here it is demonstrated for 4-dimensional case, how THnSparse can be declared and used in a simple example. The whole procedure can be trivially generalized for more than 4 dimensions.} 
+\noindent\textbf{Declaration, filling and retrieving the content:} {\it Use this code snippet and save it in the file named {\it sparse.C} --- here it is demonstrated for a 4-dimensional case, how THnSparse can be declared and used in a simple example. The whole procedure can be trivially generalized for more than 4 dimensions.} 
 
 \begin{verbatim}
 // Include all headers:
@@ -62,11 +62,13 @@ int sparse() {
 }
 \end{verbatim}
 
-\noindent Execute the above code either in the interpreted mode via \verb| root -q sparse.C |, or compile and execute in the standard way using \verb| root -q sparse.C++ |. In both cases, you shall get 3 as a printout, because in the specified multi-dimensional bin, the multi-dimensional vector was filled 3 times (once with default weight 1, and once with weight 2). All other bins shall be empty.  
+\noindent Execute the above code either in the interpreted mode via \verb| root -q sparse.C |, or compile and execute the compiled code using \verb| root -q sparse.C++ |. You shall get 3 as a printout, because in the specified multi-dimensional bin, the multi-dimensional vector was filled 3 times (once with the default weight 1, and once with weight 2). All other bins shall be empty.  
 
 \bigskip
 
-\noindent\textbf{Projections to lower dimensions:} {\it Use this code snippet and save it in the file named {\it projection.C} --- here it is demonstrated how one 3-dimensional sparse histogram can be projected onto three 2-dimensional sparse histograms. The procedure can be trivially generalized for other cases of interest:}
+\noindent\textbf{Projections to lower dimensions:} {\it Use this code snippet and save it in the file named {\it projection.C} --- here it is demonstrated how one 3-dimensional sparse histogram can be projected onto three 2-dimensional sparse histograms. The procedure can be trivially generalized for other cases of interest.}
+
+{ \small
 
 \begin{verbatim}
 // Include all headers:
@@ -82,6 +84,9 @@ int projection() {
  double min[nDim] = {0., 100., 1000.}; // lower bin boundary in each dimension
  double max[nDim] = {10., 120., 1030.}; // upper bin boundary in each dimension
  THnSparse* hs_xyz = new THnSparseD("hs_xyz", "someTitle", nDim, nBins, min, max);
+ hs_xyz->GetAxis(0)->SetTitle("x"); // set title of the 1st axis 	
+ hs_xyz->GetAxis(1)->SetTitle("y"); // set title of the 2nd axis 	
+ hs_xyz->GetAxis(2)->SetTitle("z"); // set title of the 3rd axis 	
 		
  // Projections onto three 2-dimensional sparse histograms:
  // a) project out "2 = z", i.e. keep "0 = x" horizontal vs. "1 = y" vertical
@@ -102,7 +107,15 @@ int projection() {
 	
 \end{verbatim}
 
-\noindent\textbf{Challenge:} {\it Set up a Toy Monte Carlo study, in which you will fill 3-dimensional sparse histogram (decide yourself on the binning and total number of samplings). After the 3-dimensional sparse histogram is filled, make projection onto one 2-dimensional sparse histogram by keeping axes ``x'' and ``y'', and onto one 1-dimensional sparse histogram by keeping only the axis ``y''. This example illustrates how one can during data processing book and fill one large multi-dimensional sparse histogram, and then later ``cherry-pick'' from it only the information which is needed in particular analysis, by making projections to lower dimensions.}
+} % \small
+
+\noindent\textbf{Challenge:} {\it Set up a Toy Monte Carlo study, in which you will fill a 3-dimensional sparse histogram (decide yourself on the binning and total number of samplings). After the 3-dimensional sparse histogram is filled, make a projection onto one 2-dimensional sparse histogram by keeping axes ``x'' and ``y'', and onto one 1-dimensional sparse histogram by keeping only the axis ``y''. This example illustrates how one can book and fill one large multi-dimensional sparse histogram, and then later ``cherry-pick'' from it only the information which is needed in a particular analysis, by making projections to lower dimensions. For visualization and drawing, one can project sparse histograms also directly into the standard 1D, 2D, and 3D histograms, by using e.g.:}
+{ \small
+\begin{verbatim}
+	 TH2D* hist_xy = hs_xyz->Projection(0, 1); 
+	 hist_xy->Draw();
+\end{verbatim}
+}	
 
 
 \end{document}
