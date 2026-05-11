@@ -87,7 +87,23 @@ void ShiftAlongXaxis(TGraphErrors *ge, Double_t shift)
 ShiftAlongXaxis(pointer-to-TGraphErrors-object,value-of-displacement);
 \end{verbatim}
 }
+
+%
+\noindent c) In case you downloaded from the HEPData website ALICE measurements in the ROOT file, note the ROOT command-line utility {\rm\bf rootls}, which you can use (if ROOT environment is enabled!) to inspect the content of ROOT file directly from the command line:
+{\small
+	\begin{verbatim}
+		$ rootls -lr someFile.root
+		
+		# To check other options, check its help page:
+		$ rootls --help
+	\end{verbatim}
 }
+
+\noindent In the same fashion, check out ROOT command-line utilities {\rm\bf rootcp} (copy objects from ROOT files into another), and {\rm\bf rootrm} (remove objects from ROOT files directly from command line).
+
+}
+
+\bigskip
 
 \noindent Please send me the figure you have obtained via email, as well as code snippets, so I can provide feedback also on your coding!
 
